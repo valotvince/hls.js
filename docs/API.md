@@ -50,7 +50,7 @@
   - [`fragLoadingMaxRetryTimeout` / `manifestLoadingMaxRetryTimeout` / `levelLoadingMaxRetryTimeout`](#fragloadingmaxretrytimeout--manifestloadingmaxretrytimeout--levelloadingmaxretrytimeout)
   - [`fragLoadingRetryDelay` / `manifestLoadingRetryDelay` / `levelLoadingRetryDelay`](#fragloadingretrydelay--manifestloadingretrydelay--levelloadingretrydelay)
   - [`startFragPrefetch`](#startfragprefetch)
-  - [`testBandwidth`](#testBandwidth) 
+  - [`testBandwidth`](#testBandwidth)
   - [`appendErrorMaxRetry`](#appenderrormaxretry)
   - [`loader`](#loader)
   - [`fLoader`](#floader)
@@ -368,6 +368,8 @@ Configuration parameters could be provided to hls.js upon instantiation of `Hls`
       minAutoBitrate: 0,
       emeEnabled: false,
       widevineLicenseUrl: undefined,
+      fairplayLicenseUrl: undefined,
+      fairplayCertificateUrl: undefined,
       requestMediaKeySystemAccessFunc: requestMediaKeySystemAccess
   };
 
@@ -633,7 +635,7 @@ Prefetch start fragment although media not attached.
 Start prefetching start fragment although media not attached yet.
 
 ### `testBandwidth`
-                  
+
 (default: `true`)
 
 Load the first fragment of the lowest level to establish a bandwidth estimate before selecting the first auto-level.
@@ -934,7 +936,7 @@ Whether or not render captions natively using the HTMLMediaElement's TextTracks.
 when you want to handle rending of track and track cues using `NON_NATIVE_TEXT_TRACKS_FOUND` and `CUES_PARSED` events.
 
 parameter should be a boolean
-  
+
 ### `stretchShortVideoTrack`
 
 (default: `false`)
