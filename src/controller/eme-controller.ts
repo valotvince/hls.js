@@ -62,8 +62,8 @@ const getSupportedMediaKeySystemConfigurations = function (keySystem: KeySystems
   switch (keySystem) {
   case KeySystems.WIDEVINE:
     return createMediaKeySystemConfigurations([], audioCodecs, videoCodecs);
-    case KeySystems.FAIRPLAY:
-      return createMediaKeySystemConfigurations(['sinf'], audioCodecs, videoCodecs);
+  case KeySystems.FAIRPLAY:
+    return createMediaKeySystemConfigurations(['sinf'], audioCodecs, videoCodecs);
   default:
     throw new Error(`Unknown key-system: ${keySystem}`);
   }
