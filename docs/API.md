@@ -370,6 +370,7 @@ Configuration parameters could be provided to hls.js upon instantiation of `Hls`
       widevineLicenseUrl: undefined,
       fairplayLicenseUrl: undefined,
       fairplayCertificateUrl: undefined,
+      fairplayCertificateData: undefined,
       requestMediaKeySystemAccessFunc: requestMediaKeySystemAccess
   };
 
@@ -1050,6 +1051,18 @@ then if config value is set to `true`, ABR will use 2.5 Mb/s for this quality le
 
 Return the capping/min bandwidth value that could be used by automatic level selection algorithm.
 Useful when browser or tab of the browser is not in the focus and bandwidth drops
+
+### `fairplayCertificateUrl`
+
+(default: `undefined`)
+
+Fairplay certificate fetching URL
+`fairplayCertificateData` takes precedence over that parameter
+
+### `fairplayCertificateData`
+
+(default: `undefined`)
+Fairplay Certificate data to use configure MediaKeys (takes precedence over `fairplayCertificateUrl`)
 
 
 ## Video Binding/Unbinding API

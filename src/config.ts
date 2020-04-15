@@ -47,6 +47,7 @@ export type EMEControllerConfig = {
   emeEnabled: boolean,
   widevineLicenseUrl?: string,
   fairplayCertificateUrl?: string,
+  fairplayCertificateData?: BufferSource,
   fairplayLicenseUrl?: string,
 
   requestMediaKeySystemAccessFunc: MediaKeyFunc | null,
