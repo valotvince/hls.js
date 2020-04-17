@@ -16,8 +16,8 @@ import * as Cues from './utils/cues';
 import TimelineController from './controller/timeline-controller';
 import SubtitleTrackController from './controller/subtitle-track-controller';
 import { SubtitleStreamController } from './controller/subtitle-stream-controller';
-import EMEController from './controller/eme-controller';
-import { requestMediaKeySystemAccess, MediaKeyFunc } from './utils/mediakeys-helper';
+import EMEController, { MediaKeysListItem } from './controller/eme-controller';
+import { requestMediaKeySystemAccess, MediaKeyFunc, generateLicenseChallenge, GenerateLicenseChallengFunc } from './utils/mediakeys-helper';
 
 type ABRControllerConfig = {
   abrEwmaFastLive: number,
@@ -43,7 +43,7 @@ type CapLevelControllerConfig = {
 };
 
 export type EMEControllerConfig = {
-  licenseXhrSetup?: (xhr: XMLHttpRequest, url: string) => void,
+  licenseXhrSetup?: (xhr: XMLHttpRequest, url: string, keysListItem: MediaKeysListItem) => void,
   emeEnabled: boolean,
   widevineLicenseUrl?: string,
   fairplayCertificateUrl?: string,
@@ -51,6 +51,7 @@ export type EMEControllerConfig = {
   fairplayLicenseUrl?: string,
 
   requestMediaKeySystemAccessFunc: MediaKeyFunc | null,
+  emeGenerateLicenseChallengeFunc: GenerateLicenseChallengFunc | null
 };
 
 type FragmentLoaderConfig = {
@@ -247,6 +248,7 @@ export const hlsDefaultConfig: HlsConfig = {
   fairplayLicenseUrl: void 0, // used by eme-controller
   fairplayCertificateUrl: void 0, // used by eme-controller
   requestMediaKeySystemAccessFunc: requestMediaKeySystemAccess, // used by eme-controller
+  emeGenerateLicenseChallengeFunc: generateLicenseChallenge, // used by eme-controller
   testBandwidth: true,
 
   // Dynamic Modules
