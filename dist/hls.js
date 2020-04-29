@@ -20015,6 +20015,32 @@ var eme_controller_EMEController = /*#__PURE__*/function (_EventHandler) {
       _this.mediaKeysPromise.then(finallySetKeyAndStartSession).catch(finallySetKeyAndStartSession);
     };
 
+    _this._setupLicenseXHR = function (xhr, url, keysListItem) {
+      var licenseXhrSetup = _this._licenseXhrSetup;
+
+      if (!licenseXhrSetup) {
+        return Promise.resolve();
+      }
+
+      return new Promise(function (resolve, reject) {
+        licenseXhrSetup(xhr, url, keysListItem).then(resolve).catch(function () {
+          // let's try to open before running setup
+          xhr.open('POST', url, true);
+          return licenseXhrSetup(xhr, url, keysListItem);
+        }).then(function () {
+          // if licenseXhrSetup did not yet call open, let's do it now
+          if (!xhr.readyState) {
+            xhr.open('POST', url, true);
+          }
+
+          resolve();
+        }).catch(function (e) {
+          // IE11 throws an exception on xhr.open if attempting to access an HTTP resource over HTTPS
+          reject(new Error("issue setting up KeySystem license XHR " + e));
+        });
+      });
+    };
+
     _this._config = hls.config;
     _this._widevineLicenseUrl = _this._config.widevineLicenseUrl;
     _this._fairplayLicenseUrl = _this._config.fairplayLicenseUrl;
@@ -20305,7 +20331,8 @@ var eme_controller_EMEController = /*#__PURE__*/function (_EventHandler) {
 
       xhr.send();
     });
-  }
+  };
+
   /**
    * @private
    * @param {string} url License server URL
@@ -20314,37 +20341,17 @@ var eme_controller_EMEController = /*#__PURE__*/function (_EventHandler) {
    * @returns {XMLHttpRequest} Unsent (but opened state) XHR object
    * @throws if XMLHttpRequest construction failed
    */
-  ;
-
   _proto._createLicenseXhr = function _createLicenseXhr(keysListItem, keyMessage, callback) {
+    var _this7 = this;
+
     var url = this.getLicenseServerUrl(keysListItem.mediaKeySystemDomain);
     var xhr = new XMLHttpRequest();
-    var licenseXhrSetup = this._licenseXhrSetup;
-
-    try {
-      if (licenseXhrSetup) {
-        try {
-          licenseXhrSetup(xhr, url, keysListItem);
-        } catch (e) {
-          // let's try to open before running setup
-          xhr.open('POST', url, true);
-          licenseXhrSetup(xhr, url, keysListItem);
-        }
-      } // if licenseXhrSetup did not yet call open, let's do it now
-
-
-      if (!xhr.readyState) {
-        xhr.open('POST', url, true);
-      }
-    } catch (e) {
-      // IE11 throws an exception on xhr.open if attempting to access an HTTP resource over HTTPS
-      throw new Error("issue setting up KeySystem license XHR " + e);
-    } // Because we set responseType to ArrayBuffer here, callback is typed as handling only array buffers
-
-
-    xhr.responseType = 'arraybuffer';
-    xhr.onreadystatechange = this._onLicenseRequestReadyStageChange.bind(this, xhr, url, keyMessage, callback);
-    return xhr;
+    return this._setupLicenseXHR(xhr, url, keysListItem).then(function () {
+      // Because we set responseType to ArrayBuffer here, callback is typed as handling only array buffers
+      xhr.responseType = 'arraybuffer';
+      xhr.onreadystatechange = _this7._onLicenseRequestReadyStageChange.bind(_this7, xhr, url, keyMessage, callback);
+      return xhr;
+    });
   }
   /**
    * @private
@@ -20397,6 +20404,8 @@ var eme_controller_EMEController = /*#__PURE__*/function (_EventHandler) {
   ;
 
   _proto._requestLicense = function _requestLicense(keyMessage, callback) {
+    var _this8 = this;
+
     logger["logger"].log('Requesting content license for key-system');
     var keysListItem = this._mediaKeysList[0];
 
@@ -20410,23 +20419,23 @@ var eme_controller_EMEController = /*#__PURE__*/function (_EventHandler) {
       return;
     }
 
-    try {
-      var _url = this.getLicenseServerUrl(keysListItem.mediaKeySystemDomain);
+    this._createLicenseXhr(keysListItem, keyMessage, callback).then(function (xhr) {
+      var url = _this8.getLicenseServerUrl(keysListItem.mediaKeySystemDomain);
 
-      var _xhr = this._createLicenseXhr(keysListItem, keyMessage, callback);
+      logger["logger"].log("Sending license request to URL: " + url);
 
-      logger["logger"].log("Sending license request to URL: " + _url);
-      var challenge = this.emeGenerateLicenseChallengeFunc(keysListItem.mediaKeySystemDomain, keyMessage);
+      var challenge = _this8.emeGenerateLicenseChallengeFunc(keysListItem.mediaKeySystemDomain, keyMessage);
 
-      _xhr.send(challenge);
-    } catch (e) {
+      xhr.send(challenge);
+    }).catch(function (e) {
       logger["logger"].error("Failure requesting DRM license: " + e);
-      this.hls.trigger(events["default"].ERROR, {
+
+      _this8.hls.trigger(events["default"].ERROR, {
         type: errors["ErrorTypes"].KEY_SYSTEM_ERROR,
         details: errors["ErrorDetails"].KEY_SYSTEM_LICENSE_REQUEST_FAILED,
         fatal: true
       });
-    }
+    });
   };
 
   _proto.onMediaAttached = function onMediaAttached(data) {
@@ -20763,7 +20772,7 @@ var hls_Hls = /*#__PURE__*/function (_Observer) {
      * @type {string}
      */
     get: function get() {
-      return undefined;
+      return "0.13.2-alpha.0";
     }
   }, {
     key: "Events",
