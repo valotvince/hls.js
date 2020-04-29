@@ -19834,8 +19834,8 @@ var requestMediaKeySystemAccess = function () {
   }
 }();
 
-var generateLicenseChallenge = function generateLicenseChallenge(keySystem, keyMessage) {
-  switch (keySystem) {
+var generateLicenseChallenge = function generateLicenseChallenge(keySystemItem, keyMessage) {
+  switch (keySystemItem.mediaKeySystemDomain) {
     // case KeySystems.PLAYREADY:
     // from https://github.com/MicrosoftEdge/Demos/blob/master/eme/scripts/demo.js
 
@@ -19865,7 +19865,7 @@ var generateLicenseChallenge = function generateLicenseChallenge(keySystem, keyM
       return keyMessage;
   }
 
-  throw new Error("unsupported key-system: " + keySystem);
+  throw new Error("unsupported key-system: " + keySystemItem.mediaKeySystemDomain);
 };
 
 
@@ -20424,7 +20424,7 @@ var eme_controller_EMEController = /*#__PURE__*/function (_EventHandler) {
 
       logger["logger"].log("Sending license request to URL: " + url);
 
-      var challenge = _this8.emeGenerateLicenseChallengeFunc(keysListItem.mediaKeySystemDomain, keyMessage);
+      var challenge = _this8.emeGenerateLicenseChallengeFunc(keysListItem, keyMessage);
 
       xhr.send(challenge);
     }).catch(function (e) {
