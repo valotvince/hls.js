@@ -43,7 +43,7 @@ type CapLevelControllerConfig = {
 };
 
 export type EMEControllerConfig = {
-  licenseXhrSetup?: (xhr: XMLHttpRequest, url: string, keysListItem: MediaKeysListItem) => void,
+  licenseXhrSetup?: (xhr: XMLHttpRequest, url: string, keysListItem: MediaKeysListItem) => Promise<any>,
   emeEnabled: boolean,
   widevineLicenseUrl?: string,
   fairplayCertificateUrl?: string,
